@@ -1,4 +1,6 @@
-# Terraform for_each toset() demo
+# Terraform `for_each = toset()` demo
+
+## Problem
 
 When you try to do something entirely reasonable like create a "diagnostic setting" resource for each resource in a list, using a simple `for_each` loop on those resources' IDs, you get this error:
 
@@ -9,11 +11,17 @@ must be a map, or set of strings, and you have provided a value of type tuple.
 
 Or this one:
 ```
-The given "for_each" argument value is unsuitable: the "for_each" argument
-must be a map, or set of strings, and you have provided a value of type tuple.
+The "for_each" value depends on resource attributes that cannot be determined
+until apply, so Terraform cannot predict how many instances will be created.
+To work around this, use the -target argument to first apply only the
+resources that the for_each depends on.
 ```
 
 One way to "fix" this is to use `count` instead of `for_each`. However, this is bad because it makes the resources unstable at the next `apply` when the upstream resource list is changed.
+
+Also ignore the advice about using `-target`. That's fiddly. We're using IaC because we don't want fiddly.
+
+## Solution
 
 This repo provides a simple demonstration of this problem (using `null_resource` to isolate the issue without needing to deploy real infra) and how to solve it using `zipmap()`.
 
